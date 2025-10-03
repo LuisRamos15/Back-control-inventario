@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://killuaryu1118_db_user:mrr34r3ZRUMTzfbK@cluster0.ve9xziv.mongodb.net/inventario_db?retryWrites=true&w=majority&appName=Cluster0
+      database: inventario_db
+  application:
+    name: inventario-api
+
+server:
+  port: 8080
+
+app:
+  jwt:
+    # Debe tener 32+ caracteres por el chequeo que hicimos en JwtUtil
+    secret: "f93e!A7kP#1rZxL@9yT%uQ2wN^sGdV4bM&jEoR8pC*5hLkF6"
+    expiration-minutes: 120
