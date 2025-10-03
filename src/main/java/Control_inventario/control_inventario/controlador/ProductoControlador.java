@@ -1,43 +1,50 @@
 package Control_inventario.control_inventario.controlador;
+
+import Control_inventario.control_inventario.entidad.Producto;
+import Control_inventario.control_inventario.servicio.ProductoServicio;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/productos")
 public class ProductoControlador {
-    @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')")
-    public List<Map<String, Object>> listar() {
-        return List.of(
-                Map.of("id", "p1", "nombre", "Laptop", "stock", 12),
-                Map.of("id", "p2", "nombre", "Mouse", "stock", 55)
-        );
+
+    private final ProductoServicio servicio;
+
+    public ProductoControlador(ProductoServicio servicio) {
+        this.servicio = servicio;
     }
 
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','SUPERVISOR','OPERADOR')")
+    public List<Producto> listar() {
+        return servicio.listar();
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','SUPERVISOR')")
-    public Map<String, Object> crear(@RequestBody Map<String, Object> body) {
-        body.put("id", "nuevo-id");
-        return body;
+    public ResponseEntity<Producto> crear(@RequestBody Producto body) {
+        Producto creado = servicio.crear(body);
+        return ResponseEntity.created(URI.create("/api/productos/" + creado.getId())).body(creado);
     }
-
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','SUPERVISOR')")
-    public Map<String, Object> actualizar(@PathVariable String id, @RequestBody Map<String, Object> body) {
-        body.put("id", id);
-        body.put("actualizado", true);
-        return body;
+    public ResponseEntity<Producto> actualizar(@PathVariable String id, @RequestBody Producto body) {
+        return servicio.actualizar(id, body)
+                .map(p -> ResponseEntity.ok(p))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
-
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Map<String, Object> eliminar(@PathVariable String id) {
-        return Map.of("id", id, "eliminado", true);
+    public ResponseEntity<?> eliminar(@PathVariable String id) {
+        boolean ok = servicio.eliminar(id);
+        if (ok) return ResponseEntity.ok().body(java.util.Map.of("id", id, "eliminado", true));
+        return ResponseEntity.notFound().build();
     }
 }
