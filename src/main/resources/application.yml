@@ -1,7 +1,8 @@
 spring:
   data:
     mongodb:
-      uri: mongodb+srv://killuaryu1118_db_user:mrr34r3ZRUMTzfbK@cluster0.ve9xziv.mongodb.net/inventario_db?retryWrites=true&w=majority&appName=Cluster0
+      host: localhost
+      port: 27017
       database: inventario_db
   application:
     name: inventario-api
